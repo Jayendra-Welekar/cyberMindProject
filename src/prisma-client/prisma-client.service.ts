@@ -36,10 +36,13 @@ export class PrismaClientService {
     }
 
     async getJobProfiles(page: number, limit: number, filter) : Promise<ReturnJobProfileData[]>{
-        console.log(filter)
+     
         const from = (page - 1) * limit
+        if(filter.salaryRange != null || filter.salaryRange != undefined){
+            console.log(filter.salaryRange)
+        }
         try{
-            const jobProfiles : ReturnJobProfileData[] = await this.prismaClient.jobProfile.findMany({
+            let jobProfiles : ReturnJobProfileData[] = await this.prismaClient.jobProfile.findMany({
                 where: {
                     ...(filter.jobTitle && { OR: filter.jobTitle.split(' ').map((word: string) => ({
                         jobTitle: {
@@ -54,14 +57,14 @@ export class PrismaClientService {
                 take: limit ?? 1,
             })
 
-            if(filter.salaryRange ){
-                jobProfiles.filter(jobProfile => {
+            if(filter.salaryRange && filter.salaryRange.length === 2){
+                jobProfiles = jobProfiles.filter(jobProfile => {
                     const [min, max] = filter.salaryRange
-                    return (jobProfile.jobSalary[0] >= min && jobProfile.jobSalary[0] <= max) && (jobProfile.jobSalary[1] >= min && jobProfile.jobSalary[1] <= max)
+                    return !(jobProfile.jobSalary[1] < min || jobProfile.jobSalary[0] > max)
                 })
             }
 
-            console.log(jobProfiles)
+            console.log("Returing job profiles", jobProfiles)
             return jobProfiles
         } catch (error) {
             console.log(error)

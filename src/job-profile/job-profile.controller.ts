@@ -11,7 +11,7 @@ export class JobProfileController {
  
     @Get("/jobProfiles")
     async getJobProfiles(@Query('page') page, @Query('limit') limit, @Query('jobTitle') jobTitle, @Query('jobType') jobType, @Query('jobLocation') jobLocation, @Query('salaryRange') salaryRange): Promise<ReturnJobProfileData[]> {
-        console.log(page, limit)
+       
        try{
             const filter = {
                 jobTitle : jobTitle ?? null, 
